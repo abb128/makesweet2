@@ -266,8 +266,17 @@ Number.prototype.pad = function(size) {
 	return s;
 }
 
+
+
+var animating = false;
 function doAnimation(gl, drawCallback, canvas) {
+	if(animating) return;
+	animating = true;
+	
 	console.log("animating");
+	document.querySelector("#animateBtn").disabled = true;
+	document.querySelector("#animateBtn").innerText = "Animating...";
+	
 	var gif = new GIF({
 		workers: 2,
 		quality: 10,
@@ -298,6 +307,10 @@ function doAnimation(gl, drawCallback, canvas) {
 			gif.on('finished', function(blob) {
 				console.log("Download");
 				download(blob, "avali.gif", "image/gif");
+				
+				animating = false;
+				document.querySelector("#animateBtn").disabled = false;
+				document.querySelector("#animateBtn").innerText = "Done!";
 			});
 
 			gif.render();
