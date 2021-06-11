@@ -1,0 +1,106 @@
+<html>
+<head>
+
+</head>
+<body style="display: grid;">
+	<div style="display: none;">
+		light
+		<input type='file' id="textureUpload0"></input>
+	</div>
+	<div style="display: none;">
+		dark
+		<input type='file' id="textureUpload1"></input>
+	</div>
+	<div style="display: none;">
+		mapper
+		<input type='file' id="textureUpload2"></input>
+	</div>
+	<div style="display: none;">
+		mapper2
+		<input type='file' id="textureUpload3"></input>
+	</div>
+	<div>
+		Feathers 2
+		<input type='file' id="textureUpload4"></input>
+	</div>
+	<div>
+		Body
+		<input type='file' id="textureUpload5"></input>
+	</div>
+	<div>
+		Eyes
+		<input type='file' id="textureUpload6"></input>
+	</div>
+	
+	<canvas id="main" width="128" height="128"></canvas>
+	<div>
+		<button id="animateBtn">Animate</button>
+	</div>
+	<script src="gl-matrix-min.js"></script>
+	<script src="CCapture.all.min.js"></script>
+	<!-- Vertex Shader -->
+	<script id="shader-vs" type="x-shader/x-vertex">
+		precision highp float;
+		
+		attribute vec4 aVertexPosition;
+		uniform mat4 uModelViewMatrix;
+		uniform mat4 uProjectionMatrix;
+		
+		varying vec4 vertexPosition;
+		
+		void main() {
+			gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+			vertexPosition = aVertexPosition;
+		}
+	</script>
+		
+	<!-- Fragment Shader -->
+	<script id="shader-fs" type="x-shader/x-fragment">
+		precision highp float;
+		
+		varying vec4 vertexPosition;
+		
+		uniform sampler2D img0; // light
+		uniform sampler2D img1; // dark
+		uniform sampler2D img2; // mapper
+		uniform sampler2D img3; // mapper2
+		uniform sampler2D img4; // source1
+		uniform sampler2D img5; // source2
+		uniform sampler2D img6; // source3
+		
+		void main() {
+			vec2 uv = vec2(vertexPosition.x, 1.0 - vertexPosition.y);
+			highp vec4 mapper = texture2D(img2, uv);
+			
+			highp float uv_idx_f = mapper.z * 255.0 / 16.0;
+			highp float uv_int = floor(uv_idx_f);
+			highp float uv_frac = fract(uv_idx_f);
+			
+			vec2 remapped_uv = vec2(mapper.x / 16.0 +  uv_frac, mapper.y / 16.0 + uv_int / 16.0);
+			
+			
+			
+			vec4 mixc = texture2D(img3, uv);
+			
+			vec4 source_col = vec4(0.0, 0.0, 0.0, 0.0);
+			source_col = mix(source_col, texture2D(img4, remapped_uv), mixc.r);
+			source_col = mix(source_col, texture2D(img5, remapped_uv), mixc.g);
+			source_col = mix(source_col, texture2D(img6, remapped_uv), mixc.b);
+			
+			
+			vec4 dark = texture2D(img1, uv);
+			vec4 base = texture2D(img0, uv);
+			
+			source_col *= (dark + vec4(1.0, 1.0, 1.0, 1.0));
+			source_col *= base;
+			
+			vec4 final_color = mix(base, source_col, mapper.a);
+		
+			gl_FragColor = final_color;
+		}
+	</script>
+		
+	
+	<script src="main.js"></script>
+</body>
+</html>
