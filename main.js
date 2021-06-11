@@ -218,10 +218,10 @@ function main() {
 	for(var i = 0; i < textureCount; i++) {
 		setupTexture(gl, i, drawCallback);
 	}
-	loadTexture(gl, textures[0], "/anim0/light/" + (1).pad(4) + ".png", drawCallback);
-	loadTexture(gl, textures[1], "/anim0/dark/" + (1).pad(4) + ".png", drawCallback);
-	loadTexture(gl, textures[2], "/anim0/mapper/" + (1).pad(4) + ".png", drawCallback);
-	loadTexture(gl, textures[3], "/anim0/mapper2/" + (1).pad(4) + ".png", drawCallback);
+	loadTexture(gl, textures[0], "anim0/light/" + (1).pad(4) + ".png", drawCallback);
+	loadTexture(gl, textures[1], "anim0/dark/" + (1).pad(4) + ".png", drawCallback);
+	loadTexture(gl, textures[2], "anim0/mapper/" + (1).pad(4) + ".png", drawCallback);
+	loadTexture(gl, textures[3], "anim0/mapper2/" + (1).pad(4) + ".png", drawCallback);
 
 	drawCallback();
 
@@ -298,10 +298,10 @@ function doAnimation(gl, drawCallback, canvas) {
 
 
 		if(i < 181) {
-			loadTexture(gl, textures[0], "/anim0/light/" + i.pad(4) + ".png", loadCallback);
-			loadTexture(gl, textures[1], "/anim0/dark/" + i.pad(4) + ".png", loadCallback);
-			loadTexture(gl, textures[2], "/anim0/mapper/" + i.pad(4) + ".png", loadCallback);
-			loadTexture(gl, textures[3], "/anim0/mapper2/" + i.pad(4) + ".png", loadCallback);
+			loadTexture(gl, textures[0], "anim0/light/" + i.pad(4) + ".png", loadCallback);
+			loadTexture(gl, textures[1], "anim0/dark/" + i.pad(4) + ".png", loadCallback);
+			loadTexture(gl, textures[2], "anim0/mapper/" + i.pad(4) + ".png", loadCallback);
+			loadTexture(gl, textures[3], "anim0/mapper2/" + i.pad(4) + ".png", loadCallback);
 		} else {
 			console.log("End of animation!");
 			gif.on('finished', function(blob) {
