@@ -103,6 +103,27 @@ function setupTexture(gl, i, redrawCallback) {
 	callback(document.querySelector("#textureUpload" + String(i)));
 }
 
+
+function makeEmptyTexture(gl, i){
+	const texture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+
+	const level = 0;
+	const internalFormat = gl.RGBA;
+	const width = 1;
+	const height = 1;
+	const border = 0;
+	const srcFormat = gl.RGBA;
+	const srcType = gl.UNSIGNED_BYTE;
+	const pixel = new Uint8Array([0, 0, 255, 255]); // blue for no image
+	gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+		width, height, border, srcFormat, srcType,
+		pixel);
+
+	textures[i] = texture;
+}
+
+
 function drawScene(gl, programInfo, buffers, textureSlots) {
 	gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
 	gl.clearDepth(1.0); // Clear everything
@@ -157,7 +178,20 @@ function drawScene(gl, programInfo, buffers, textureSlots) {
 		gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
 	}
 }
+
+
 var canvas;
+var changeAnim;
+var currAnim = "anim0";
+var maxframe = 180;
+
+function loadAllImages(gl, idx, callback, texoffset){
+	loadTexture(gl, textures[texoffset + 0], currAnim + "/light/" + (idx).pad(4) + ".png", callback);
+	loadTexture(gl, textures[texoffset + 1], currAnim + "/dark/" + (idx).pad(4) + ".png", callback);
+	loadTexture(gl, textures[texoffset + 2], currAnim + "/mapper/" + (idx).pad(4) + ".png", callback);
+	loadTexture(gl, textures[texoffset + 3], currAnim + "/mapper2/" + (idx).pad(4) + ".png", callback);
+}
+
 
 function main() {
 	const canvas = document.querySelector("#main");
@@ -215,20 +249,42 @@ function main() {
 		drawScene(gl, programInfo, buffers, textureSlots);
 	}
 
+	
 	for(var i = 0; i < textureCount; i++) {
 		setupTexture(gl, i, drawCallback);
 	}
-	loadTexture(gl, textures[0], "anim0/light/" + (1).pad(4) + ".png", drawCallback);
-	loadTexture(gl, textures[1], "anim0/dark/" + (1).pad(4) + ".png", drawCallback);
-	loadTexture(gl, textures[2], "anim0/mapper/" + (1).pad(4) + ".png", drawCallback);
-	loadTexture(gl, textures[3], "anim0/mapper2/" + (1).pad(4) + ".png", drawCallback);
+	
+	
+	loadAllImages(gl, 1, drawCallback, 0);
 
 	drawCallback();
+	
+	makeEmptyTexture(gl, textureCount + 1);
+	makeEmptyTexture(gl, textureCount + 2);
+	makeEmptyTexture(gl, textureCount + 3);
+	makeEmptyTexture(gl, textureCount + 4);
+
+	changeAnim = function(to, maxframes){
+		console.log("Switching to " + to);
+		maxframe = maxframes;
+		currAnim = to;
+		loadAllImages(gl, 1, drawCallback, 0);
+		
+		setTimeout(function(){
+			for(var i=1; i<maxframe; i++){
+				loadAllImages(gl, i, function(){}, textureCount + 1); 
+			}
+		}, 200);
+	}
+	
+	changeAnim("anim0", 180);
+
 
 	document.querySelector("#animateBtn").addEventListener("click", function() {
 		doAnimation(gl, drawCallback, canvas);
 	});
 }
+
 
 function loadTexture(gl, texture, url, callbackLoad) {
 
@@ -284,24 +340,22 @@ function doAnimation(gl, drawCallback, canvas) {
 		dither: "FloydSteinberg-serpentine",
 	});
 
-	var i = 1;
+	var i = 0;
 	var loads = 0;
 
 	const render_and_next = () => {
-		//console.log("frame");
-		drawCallback();
-		gif.addFrame(canvas, {
-			copy: true,
-			delay: 30
-		});
+		if(i > 0){
+			drawCallback();
+			gif.addFrame(canvas, {
+				copy: true,
+				delay: 30
+			});
+		}
 		i++;
 
 
-		if(i < 181) {
-			loadTexture(gl, textures[0], "anim0/light/" + i.pad(4) + ".png", loadCallback);
-			loadTexture(gl, textures[1], "anim0/dark/" + i.pad(4) + ".png", loadCallback);
-			loadTexture(gl, textures[2], "anim0/mapper/" + i.pad(4) + ".png", loadCallback);
-			loadTexture(gl, textures[3], "anim0/mapper2/" + i.pad(4) + ".png", loadCallback);
+		if(i <= maxframe) {
+			loadAllImages(gl, i, loadCallback, 0);
 		} else {
 			console.log("End of animation!");
 			gif.on('finished', function(blob) {

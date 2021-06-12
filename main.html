@@ -3,6 +3,20 @@
 
 </head>
 <body style="display: grid;">
+	<h2>1. Pick an animation</h2>
+	<div style="display: flex;">
+		<button onclick="changeAnim('anim0', 180)" style="display: grid; margin: 8px;">
+			AvaliJAM
+			<img src="anim0/light/0001.png"></img>
+		</button>
+		
+		<button onclick="changeAnim('anim1', 100)" style="display: grid; margin: 8px;">
+			Mindblow
+			<img src="anim1/light/0001.png"></img>
+		</button>
+	</div>
+	
+	<h2>2. Input your textures (Da'vali textures)</h2>
 	<div style="display: none;">
 		light
 		<input type='file' id="textureUpload0"></input>
@@ -32,10 +46,23 @@
 		<input type='file' id="textureUpload6"></input>
 	</div>
 	
+	<h2>3. Create your GIF animation</h2>
+	
 	<canvas id="main" width="128" height="128"></canvas>
 	<div>
 		<button id="animateBtn">Animate</button>
 	</div>
+	
+	
+	<h2>4. Optimize and/or resize</h2>
+	<a href="https://ezgif.com/resize">https://ezgif.com/resize</a>
+	<a href="https://ezgif.com/optimize">https://ezgif.com/optimize</a>
+	
+	
+	<h2>Credits</h2>
+	<div>The Da'vali model is available on the <a href="https://discord.gg/avali">Avali Army Discord</a></div>
+	<div>The technical details of this page were inspired by and modelled after <a href="https://makesweet.com/">MakeSweet</a>, an online gif generator</div>
+	
 	<script src="gl-matrix-min.js"></script>
 	<script src="CCapture.all.min.js"></script>
 	<!-- Vertex Shader -->
